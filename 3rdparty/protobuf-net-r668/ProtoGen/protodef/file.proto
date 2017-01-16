@@ -1,0 +1,27 @@
+message PbVector3
+{
+	required float x = 1;	//相对X轴坐标
+	required float y = 2;	//相对Y轴坐标
+	required float z = 3;	//相对Z轴坐标
+}
+
+message PbFood
+{
+	required int32 score = 1;			//食物的分值
+	required PbVector3 position = 2;	//食物的相对坐标 (相对于棋盘的中心点)
+}
+
+message PbPlayer
+{
+	required int32 id = 1;			//玩家的id
+	repeated PbVector3 bodys = 2;	//贪吃蛇的躯干坐标信息
+}
+
+/*
+ * 单局游戏描述信息
+ */
+message PbGameFile
+{
+	required PbPlayer player = 1; 	//玩家描述信息
+	repeated PbFood foods = 2;		//食物的描述信息
+}
