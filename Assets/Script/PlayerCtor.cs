@@ -19,9 +19,7 @@ public class PlayerCtor
 
     public GameObject CreatLocalPlayer()
     {
-        GameObject tPlayerA = GameObject.Instantiate(Resources.Load("Prefabs/LocalPlayer") as GameObject);
-        GameObject tHead = GameObject.Instantiate(Resources.Load("Prefabs/Body") as GameObject);
-        tPlayerA.AddComponent<LocalPlayerImpl>().SetHead(tHead.GetComponent<HeadCtr>());
+        GameObject tPlayerA = GameObject.Instantiate(Resources.Load("Prefabs/Snake/LocalPlayer") as GameObject);
 
         Player tPlayerACtr = tPlayerA.GetComponent<Player>();
         tPlayerACtr.id = 1;

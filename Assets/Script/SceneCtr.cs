@@ -7,42 +7,46 @@ using dataconfig;
 
 public class SceneCtr : MonoBehaviour
 {
-    public Camera Camera;
-    public GameObject BorderPanel;
+    public const int CELL_SIZE = 20;
+
     public Transform FoodsCntr;
 
     public List<GameObject> Foods;
     public List<Player> Players;
 
-    private int mSize = 0;
-    private bool IsPaused = false;
-    private float mLastMovTimeStamp = 0f;
-    private const float SPEED = 0.1f;
+    public int WidthSize = 0;
+    public int HeightSize = 0;
 
-    public void Intialize(int size, float density /*[0f,1f]*/)
+    private Dictionary<int, UnityEngine.Object> ResCache = new Dictionary<int, UnityEngine.Object>();
+
+    private int mRateCnt = 0;
+    private bool mIsPaused = false;
+
+    public void Intialize(float density /*[0f,1f]*/, UIWidget box)
     {
-        this.mSize = size;
+        this.transform.parent = box.transform;
         this.transform.localPosition = Vector3.zero;
         this.transform.localScale = Vector3.one;
 
-
-        this.Camera.orthographicSize = size / 2;
-        this.BorderPanel.transform.localScale = new Vector3(size, size, size);
+        var tSizeVec = box.localSize;
+        this.WidthSize = (int)tSizeVec.x;
+        this.HeightSize = (int)tSizeVec.y;
 
         System.Random tRandomer = new System.Random((int)DateTime.Now.Ticks);
 
-        for (int i = 1; i < size; ++i)
+        int tCellCntOnWidth = this.WidthSize / CELL_SIZE;
+        int tCellCntOnHeight = this.HeightSize / CELL_SIZE;
+        for (int i = 0; i < tCellCntOnWidth; ++i)
         {
-            for (int j = 1; j < size; ++j)
+            for (int j = 0; j < tCellCntOnHeight; ++j)
             {
-                if ((i == 1) && (j == 1)) continue;
-                if ((i == size - 1) && (j == size - 1)) continue;
+                if (i == 0 && j == 0) continue;
 
                 float tNum = (tRandomer.Next(0, 100)) * 1.0f / 100.0f;
                 if (tNum < density)
                 {
-                    int tX = i - size / 2;
-                    int tY = j - size / 2;
+                    int tX = i * CELL_SIZE - (tCellCntOnWidth / 2) * CELL_SIZE;
+                    int tY = j * CELL_SIZE - (tCellCntOnHeight / 2) * CELL_SIZE;
 
                     GameObject tFoodGo = this.CreateFood(new Vector3(tX, tY, 1f), 1);
                 }
@@ -52,23 +56,35 @@ public class SceneCtr : MonoBehaviour
 
     public void InitializePlayer(Player playerA, Player playerB = null)
     {
-        this.IsPaused = false;
-        int size = this.mSize;
+        this.mIsPaused = false;
 
-        if (playerA != null)
+        if (playerB == null)
         {
             playerA.transform.parent = this.transform;
             playerA.transform.localPosition = Vector3.zero;
-            playerA.SetBeginPos(new Vector3(1 - size / 2, 1 - size / 2, 1f)); //左下角
+            playerA.transform.localScale = Vector3.one;
+            playerA.SetBeginPos(new Vector3(0f, 0f, 1f));
             this.Players.Add(playerA);
         }
-        if (playerB != null)
+        else
         {
-            playerB.transform.parent = this.transform;
-            playerB.transform.localPosition = Vector3.zero;
-            playerB.SetBeginPos(new Vector3((size - 1) - size / 2, (size - 1) - size / 2, 1f)); //右上角
-            this.Players.Add(playerB);
+            throw new NotImplementedException();
         }
+
+        //if (playerA != null)
+        //{
+        //    playerA.transform.parent = this.transform;
+        //    playerA.transform.localPosition = Vector3.zero;
+        //    playerA.SetBeginPos(new Vector3(1 - size / 2, 1 - size / 2, 1f)); //左下角
+        //    this.Players.Add(playerA);
+        //}
+        //if (playerB != null)
+        //{
+        //    playerB.transform.parent = this.transform;
+        //    playerB.transform.localPosition = Vector3.zero;
+        //    playerB.SetBeginPos(new Vector3((size - 1) - size / 2, (size - 1) - size / 2, 1f)); //右上角
+        //    this.Players.Add(playerB);
+        //}
     }
 
     public void Load(SaveLoadMgr.DataWarpper datas)
@@ -101,13 +117,45 @@ public class SceneCtr : MonoBehaviour
 
     private GameObject CreateFood(Vector3 pos, int score)
     {
-        GameObject tFood = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        tFood.AddComponent<FoodCellCtr>();
-        tFood.transform.parent = this.FoodsCntr;
-        tFood.transform.localScale = Vector3.one;
-        tFood.transform.localPosition = new Vector3(pos.x, pos.y, pos.z);
-        Foods.Add(tFood);
+        //using default
+        GameObject tFood = this.DoMakeFood(1);
+        if (tFood != null)
+        {
+            tFood.AddComponent<FoodCellCtr>();
+            tFood.transform.parent = this.FoodsCntr;
+            tFood.transform.localScale = Vector3.one;
+            tFood.transform.localPosition = new Vector3(pos.x, pos.y, pos.z);
+            Foods.Add(tFood);
+        }
         return tFood;
+    }
+
+    private GameObject DoMakeFood(int id = 1)
+    {
+        GameObject tRet = null;
+        UnityEngine.Object tRes = null;
+
+        //load cache first
+        if (this.ResCache.ContainsKey(id))
+        {
+            tRes = this.ResCache[id];
+        }
+
+        // load from device
+        if (tRes == null)
+        {
+            tRes = Resources.Load("Prefabs/Food/Food_" + id.ToString());
+            if (tRes != null)
+            {
+                this.ResCache.Add(id, tRes);
+            }
+        }
+
+        if (tRes != null)
+        {
+            tRet = GameObject.Instantiate(tRes as GameObject);
+        }
+        return tRet;
     }
 
     private FoodCellCtr CheckEat(Transform head)
@@ -129,19 +177,34 @@ public class SceneCtr : MonoBehaviour
         return tRet;
     }
 
+    private bool CheckOut(Transform head)
+    {
+        if ((Mathf.Abs(head.localPosition.x ) > (this.WidthSize / 2)) || 
+            (Mathf.Abs(head.localPosition.y) > (this.HeightSize / 2)))
+        {
+            return true;
+        }
+        return false;
+    }
+
     private void OnTick()
     {
-        float tVar = Time.realtimeSinceStartup - mLastMovTimeStamp;
+        ++mRateCnt;
+        mRateCnt %= (10);
 
-        if (tVar >= SPEED)
+        if (!this.mIsPaused && (mRateCnt == 0))
         {
-            if (!this.IsPaused)
+            for (int i = 0, tMax = Players.Count; i < tMax; ++i)
             {
-                for (int i = 0, tMax = Players.Count; i < tMax; ++i)
-                {
-                    Player player = this.Players[i];
-                    player.Move();
+                Player player = this.Players[i];
+                player.Move();
 
+                if (this.CheckOut(player.Head.transform))
+                {
+                    player.DoDead();
+                }
+                else
+                {
                     FoodCellCtr tHadEatedFood = this.CheckEat(player.Head.transform);
                     if (tHadEatedFood != null)
                     {
@@ -172,26 +235,26 @@ public class SceneCtr : MonoBehaviour
                     }
                 }
             }
-
-            mLastMovTimeStamp = Time.realtimeSinceStartup;
         }
     }
 
     public void Begin()
     {
-        StopAllCoroutines();
-        InvokeRepeating("OnTick", 0, 0.001f);
-
-        mLastMovTimeStamp = Time.realtimeSinceStartup;
+        this.mIsPaused = false;
     }
 
     public void Pause(bool pause)
     {
-        this.IsPaused = pause;
+        this.mIsPaused = pause;
     }
 
     public void Stop()
     {
-        StopAllCoroutines();
+        this.mIsPaused = true;
+    }
+
+    protected void Update()
+    {
+        this.OnTick();
     }
 }

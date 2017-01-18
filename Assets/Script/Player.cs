@@ -9,20 +9,15 @@ public abstract class Player : MonoBehaviour
     public List<GameObject> Body = new List<GameObject>();
     public int id = 0;
 
-    public Vector3 Speed = Vector3.zero;
+    public Vector3 PreMoveDir = Vector3.zero;
+    public Vector3 MoveDir = Vector3.zero;
     public abstract void Move();
 
     public virtual void Load(SaveLoadMgr.DataWarpper data) { }
 
-    public void SetHead(HeadCtr head)
+    protected virtual void Awake()
     {
-        this.Head = head;
-
-        head.gameObject.transform.parent = this.transform;
-        head.transform.localPosition = Vector3.zero;
-        head.transform.localScale = Vector3.one;
-
-        this.Body.Add(head.gameObject);
+        this.Body.Add(Head.gameObject);
     }
 
     public void SetBeginPos(Vector3 pos)
@@ -38,7 +33,7 @@ public abstract class Player : MonoBehaviour
         {
             GameObject tBody = player.Body[i];
             Vector3 tLength = this.Head.transform.localPosition - tBody.transform.localPosition;
-            if ((tLength.magnitude < 1f) && (this.Head.gameObject != tBody))
+            if ((tLength.magnitude < 1) && (this.Head.gameObject != tBody))
             {
                 return true;
             }
@@ -67,9 +62,10 @@ public abstract class Player : MonoBehaviour
 
     protected GameObject CreateBody()
     {
-        GameObject tBody = GameObject.Instantiate(Resources.Load("Prefabs/Body") as GameObject);
+        GameObject tBody = GameObject.Instantiate(Resources.Load("Prefabs/Snake/Body") as GameObject);
         tBody.AddComponent<BodyCellCtr>().id = this.id;
         tBody.transform.parent = this.transform;
+        tBody.transform.localScale = Vector3.one;
         return tBody;
     }
 

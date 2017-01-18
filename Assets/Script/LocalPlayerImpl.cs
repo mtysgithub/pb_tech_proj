@@ -7,21 +7,25 @@ public class LocalPlayerImpl : Player
     protected bool mTouching = false;
     protected Vector2 mLastTouchPos = Vector2.zero;
     protected const float MOV_SUCC_TOUCH_LENG = 3;
-    protected const float DETA_MOV_STEP = 1.0f;
+
+    protected const float SPEED = SceneCtr.CELL_SIZE; //每秒60渲染帧下移动距离
 
     public override void Move()
     {
+        float tMovFactor = (SPEED);
+        Vector3 tHeadMoveDeta = MoveDir * tMovFactor;
+
         Vector3 tOldPos = this.Head.transform.localPosition;
-        Vector3 tNewVector3 = new Vector3(tOldPos.x + Speed.x, tOldPos.y + Speed.y, tOldPos.z);
-        this.Head.transform.localPosition = tNewVector3;
+        Vector3 tNewHeadPos = tOldPos + tHeadMoveDeta;
+        this.Head.transform.localPosition = tNewHeadPos;
 
         if (this.Body.Count > 1)
         {
             for (int i = 1; i < this.Body.Count; ++i)
             {
-                Vector3 tmpVar = this.Body[i].transform.localPosition;
+                Vector3 tCurPos = this.Body[i].transform.localPosition;
                 this.Body[i].transform.localPosition = tOldPos;
-                tOldPos = tmpVar;
+                tOldPos = tCurPos;
             }
         }
     }
@@ -59,7 +63,7 @@ public class LocalPlayerImpl : Player
 
             if (this.Body.Count == 1)
             {
-                Vector3 tPos = -this.Speed;
+                Vector3 tPos = -this.MoveDir * SceneCtr.CELL_SIZE;
                 Vector3 tHeadPos = this.Head.transform.localPosition;
                 tBody.transform.localPosition = new Vector3(tHeadPos.x + tPos.x,
                     tHeadPos.y + tPos.y,
@@ -74,11 +78,11 @@ public class LocalPlayerImpl : Player
                 Vector3 tOffset = Vector3.zero;
                 if (Mathf.Abs(tPos.x) >= Mathf.Abs(tPos.y))
                 {
-                    tOffset = (tPos.x > 0) ? (new Vector3(1, 0, tPos.z)) : (new Vector3(-1, 0, tPos.z));
+                    tOffset = (tPos.x > 0) ? (new Vector3(SceneCtr.CELL_SIZE, 0, tPos.z)) : (new Vector3(-SceneCtr.CELL_SIZE, 0, tPos.z));
                 }
                 if (Mathf.Abs(tPos.y) >= Mathf.Abs(tPos.x))
                 {
-                    tOffset = (tPos.y > 0) ? (new Vector3(0, 1, tPos.z)) : (new Vector3(0, -1, tPos.z));
+                    tOffset = (tPos.y > 0) ? (new Vector3(0, SceneCtr.CELL_SIZE, tPos.z)) : (new Vector3(0, -SceneCtr.CELL_SIZE, tPos.z));
                 }
 
                 tBody.transform.localPosition = new Vector3(tBodyB.transform.localPosition.x + tOffset.x,
@@ -93,15 +97,17 @@ public class LocalPlayerImpl : Player
     protected override void Update()
     {
         base.Update();
+
         Vector2 tDir = this.MoveGestureJuedge();
         //Debug.Log(string.Format("touch:{0}, {1}", tDir.x, tDir.y));
 
         if (!tDir.Equals(Vector2.zero))
         {
-            Vector3 tNormalized =  new Vector3(tDir.x, tDir.y, 0);
-            if (!(-1 * tNormalized).Equals(this.Speed))
+            Vector3 tMovDir = new Vector3(tDir.x, tDir.y, 0);
+            if (!(-1 * tMovDir).Equals(this.MoveDir) || (tMovDir).Equals(this.MoveDir))
             {
-                this.Speed = tNormalized;
+                this.PreMoveDir = this.MoveDir;
+                this.MoveDir = tMovDir;
             }
         }
     }
@@ -148,19 +154,19 @@ public class LocalPlayerImpl : Player
             //use keyboard
             if (Input.GetKeyDown(KeyCode.W))
             {
-                return new Vector2(0, DETA_MOV_STEP);
+                return new Vector2(0, 1);
             }
             if (Input.GetKeyDown(KeyCode.S))
             {
-                return new Vector2(0, -DETA_MOV_STEP);
+                return new Vector2(0, -1);
             }
             if (Input.GetKeyDown(KeyCode.A))
             {
-                return new Vector2(-DETA_MOV_STEP, 0);
+                return new Vector2(-1, 0);
             }
             if (Input.GetKeyDown(KeyCode.D))
             {
-                return new Vector2(DETA_MOV_STEP, 0);
+                return new Vector2(1, 0);
             }
         }
 

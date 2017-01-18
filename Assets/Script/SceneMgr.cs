@@ -3,35 +3,31 @@ using System;
 using System.Collections.Generic;
 using System.Collections;
 
-public sealed class SceneMgr
+public sealed class SceneMgr : MonoBehaviour
 {
+    public const int FIXED_RATE_COUNT = 60;
+
     public SceneCtr ActiveScene
     {
         get;
         private set;
     }
 
-    private static SceneMgr _instance = null;
-    public static SceneMgr Instance
+    public UIWidget SceneBox;
+
+    void Awake()
     {
-        get
-        {
-            if (null == _instance)
-            {
-                _instance = new SceneMgr();
-            }
-            return _instance;
-        }
+        UnityEngine.Application.targetFrameRate = FIXED_RATE_COUNT;
     }
 
-    public SceneCtr Make(int size, float density /*[0f,1f]*/)
+    public SceneCtr Make(float density /*[0f,1f]*/)
     {
         GameObject tBoardRes = Resources.Load("Prefabs/Board") as GameObject;
         if (tBoardRes != null)
         {
             GameObject tBoard = GameObject.Instantiate(tBoardRes);
             SceneCtr tSceneCtr = tBoard.GetComponent<SceneCtr>();
-            tSceneCtr.Intialize(size, density);
+            tSceneCtr.Intialize(density, SceneBox);
 
             return this.ActiveScene = tSceneCtr;
         }
