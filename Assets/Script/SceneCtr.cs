@@ -17,6 +17,8 @@ public class SceneCtr : MonoBehaviour
     public int WidthSize = 0;
     public int HeightSize = 0;
 
+    public List<Action<Player, int>> OnPlayerScoreChanged = new List<Action<Player, int>>();
+
     private Dictionary<int, UnityEngine.Object> ResCache = new Dictionary<int, UnityEngine.Object>();
 
     private int mRateCnt = 0;
@@ -215,6 +217,14 @@ public class SceneCtr : MonoBehaviour
                             //do clear
                             this.Foods.Remove(tHadEatedFood.gameObject);
                             GameObject.Destroy(tHadEatedFood.gameObject);
+
+                            OnPlayerScoreChanged.ForEach((cbk) => 
+                            {
+                                if (cbk != null)
+                                {
+                                    cbk(player, player.score);
+                                }
+                            });
                         }
                     }
                     else
@@ -240,6 +250,7 @@ public class SceneCtr : MonoBehaviour
 
     public void Begin()
     {
+        this.Clear();
         this.mIsPaused = false;
     }
 
@@ -251,10 +262,17 @@ public class SceneCtr : MonoBehaviour
     public void Stop()
     {
         this.mIsPaused = true;
+        this.Clear();
     }
 
     protected void Update()
     {
         this.OnTick();
+    }
+
+    protected virtual void Clear()
+    {
+        OnPlayerScoreChanged.Clear();
+        mRateCnt = 0;
     }
 }

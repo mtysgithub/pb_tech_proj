@@ -8,6 +8,7 @@ public abstract class Player : MonoBehaviour
     public HeadCtr Head;
     public List<GameObject> Body = new List<GameObject>();
     public int id = 0;
+    public int score = 0;
 
     public Vector3 PreMoveDir = Vector3.zero;
     public Vector3 MoveDir = Vector3.zero;

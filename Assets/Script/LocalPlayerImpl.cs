@@ -56,7 +56,9 @@ public class LocalPlayerImpl : Player
     public override bool OnEat(FoodCellCtr food)
     {
         int tScore = food.Score;
-        for (int i = 0; i < tScore; ++i)
+        this.score += tScore;
+
+        //for (int i = 0; i < tScore; ++i)
         {
             //append body cell
             GameObject tBody = this.CreateBody();
