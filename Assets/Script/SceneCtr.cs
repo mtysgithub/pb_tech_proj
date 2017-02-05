@@ -17,6 +17,8 @@ public class SceneCtr : MonoBehaviour
     public int WidthSize = 0;
     public int HeightSize = 0;
 
+    public SceneMgr SceneMgr;
+
     public List<Action<Player, int>> OnPlayerScoreChanged = new List<Action<Player, int>>();
 
     private Dictionary<int, UnityEngine.Object> ResCache = new Dictionary<int, UnityEngine.Object>();
@@ -24,8 +26,10 @@ public class SceneCtr : MonoBehaviour
     private int mRateCnt = 0;
     private bool mIsPaused = false;
 
-    public void Intialize(float density /*[0f,1f]*/, UIWidget box)
+    public void Intialize(SceneMgr sceneMgr, float density /*[0f,1f]*/, UIWidget box)
     {
+        this.SceneMgr = sceneMgr;
+
         this.transform.parent = box.transform;
         this.transform.localPosition = Vector3.zero;
         this.transform.localScale = Vector3.one;
@@ -91,17 +95,7 @@ public class SceneCtr : MonoBehaviour
 
     public void Load(SaveLoadMgr.DataWarpper datas)
     {
-        this.Foods.ForEach((GameObject item) =>
-        {
-            GameObject.Destroy(item);
-        });
-        this.Foods.Clear();
-
-        this.Players.ForEach((Player item) =>
-        {
-            item.DoDestroy();
-        });
-        this.Players.Clear();
+        this.Clear();
 
         datas.FoodsInf.ForEach((item) => 
         {
@@ -191,6 +185,7 @@ public class SceneCtr : MonoBehaviour
 
     private void OnTick()
     {
+        bool dead = false;
         ++mRateCnt;
         mRateCnt %= (10);
 
@@ -204,6 +199,7 @@ public class SceneCtr : MonoBehaviour
                 if (this.CheckOut(player.Head.transform))
                 {
                     player.DoDead();
+                    dead = true;
                 }
                 else
                 {
@@ -239,6 +235,7 @@ public class SceneCtr : MonoBehaviour
                                 if (tPlayerA.TouchedOtherPlayer(tPlayerB))
                                 {
                                     tPlayerA.DoDead();
+                                    dead = true;
                                 }
                             }
                         }
@@ -246,11 +243,15 @@ public class SceneCtr : MonoBehaviour
                 }
             }
         }
+
+        if (dead)
+        {
+            this.DoGameDead();
+        }
     }
 
     public void Begin()
     {
-        this.Clear();
         this.mIsPaused = false;
     }
 
@@ -270,9 +271,27 @@ public class SceneCtr : MonoBehaviour
         this.OnTick();
     }
 
+    protected virtual void DoGameDead()
+    {
+        Debug.Log("DoGameDead");
+        SceneMgr.GameDead(this);
+    }
+
     protected virtual void Clear()
     {
         OnPlayerScoreChanged.Clear();
         mRateCnt = 0;
+
+        this.Foods.ForEach((GameObject item) =>
+        {
+            GameObject.Destroy(item);
+        });
+        this.Foods.Clear();
+
+        this.Players.ForEach((Player item) =>
+        {
+            item.DoDestroy();
+        });
+        this.Players.Clear();
     }
 }

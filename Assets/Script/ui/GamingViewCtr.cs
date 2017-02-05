@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class GamingViewCtr : MonoBehaviour
 {
     public SceneMgr SceneMgr;
+    public PauseViewCtr PauseView;
     public List<UILabel> ScoreLabels;
 
     public void Initialize()
@@ -23,17 +24,26 @@ public class GamingViewCtr : MonoBehaviour
         {
             scene.OnPlayerScoreChanged.Remove(OnPlayerScoreChanged);
         }
+
+        ScoreLabels.ForEach((label) => 
+        {
+            label.text = string.Empty;
+        });
     }
 
     public void PauseClick()
     {
         Debug.Log("PauseClick");
 
+        PauseView.gameObject.SetActive(true);
+        this.gameObject.SetActive(false);
+
+        SceneMgr.Pause(true);
     }
 
     public void OnPlayerScoreChanged(Player player, int score)
     {
-        if (ScoreLabels.Count > player.id)
+        if (player.id < ScoreLabels.Count)
         {
             ScoreLabels[player.id].text = score.ToString();
         }

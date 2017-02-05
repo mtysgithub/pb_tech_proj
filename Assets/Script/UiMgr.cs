@@ -8,6 +8,8 @@ public class UiMgr : MonoBehaviour
     public EndViewCtr EndView;
     public GamingViewCtr GamingView;
 
+    public SceneMgr SceneMgr;
+
     void Awake()
     {
         MainView.gameObject.SetActive(true);
@@ -15,4 +17,12 @@ public class UiMgr : MonoBehaviour
         EndView.gameObject.SetActive(false);
         GamingView.gameObject.SetActive(false);
     }
+
+    public void GameDead(SceneCtr scene)
+    {
+        this.GamingView.UnInitialize();
+        this.GamingView.gameObject.SetActive(false);
+        this.EndView.gameObject.SetActive(true);
+    }
+
 }

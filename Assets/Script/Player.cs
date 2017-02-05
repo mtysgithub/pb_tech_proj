@@ -55,10 +55,10 @@ public abstract class Player : MonoBehaviour
     public virtual void DoDead()
     {
         Debug.Log(string.Format("player_id:{0} dead.", this.id));
-        if (UnityEngine.Application.isEditor)
-        {
-            UnityEditor.EditorApplication.isPaused = true;
-        }
+        //if (UnityEngine.Application.isEditor)
+        //{
+        //    UnityEditor.EditorApplication.isPaused = true;
+        //}
     }
 
     protected GameObject CreateBody()

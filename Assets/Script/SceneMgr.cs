@@ -13,6 +13,7 @@ public sealed class SceneMgr : MonoBehaviour
         private set;
     }
 
+    public UiMgr UiMgr;
     public UIWidget SceneBox;
 
     void Awake()
@@ -27,7 +28,7 @@ public sealed class SceneMgr : MonoBehaviour
         {
             GameObject tBoard = GameObject.Instantiate(tBoardRes);
             SceneCtr tSceneCtr = tBoard.GetComponent<SceneCtr>();
-            tSceneCtr.Intialize(density, SceneBox);
+            tSceneCtr.Intialize(this, density, SceneBox);
 
             return this.ActiveScene = tSceneCtr;
         }
@@ -35,5 +36,31 @@ public sealed class SceneMgr : MonoBehaviour
         return this.ActiveScene = null;
     }
 
-    
+    public void Pause(bool pause)
+    {
+        SceneCtr scene = this.ActiveScene;
+        if (scene != null)
+        {
+            scene.Pause(pause);
+        }
+
+    }
+
+    public void Stop()
+    {
+        SceneCtr scene = this.ActiveScene;
+        if (scene != null)
+        {
+            scene.Stop();
+        }
+
+        GameObject.Destroy(scene.gameObject);
+        this.ActiveScene = null;
+    }
+
+    public void GameDead(SceneCtr scene)
+    {
+        this.Pause(true);
+        UiMgr.GameDead(scene);
+    }
 }
