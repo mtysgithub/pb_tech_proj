@@ -12,20 +12,23 @@ public class LocalPlayerImpl : Player
 
     public override void Move()
     {
-        float tMovFactor = (SPEED);
-        Vector3 tHeadMoveDeta = MoveDir * tMovFactor;
-
-        Vector3 tOldPos = this.Head.transform.localPosition;
-        Vector3 tNewHeadPos = tOldPos + tHeadMoveDeta;
-        this.Head.transform.localPosition = tNewHeadPos;
-
-        if (this.Body.Count > 1)
+        if (!MoveDir.Equals(Vector3.zero))
         {
-            for (int i = 1; i < this.Body.Count; ++i)
+            float tMovFactor = (SPEED);
+            Vector3 tHeadMoveDeta = MoveDir * tMovFactor;
+
+            Vector3 tOldPos = this.Head.transform.localPosition;
+            Vector3 tNewHeadPos = tOldPos + tHeadMoveDeta;
+            this.Head.transform.localPosition = tNewHeadPos;
+
+            if (this.Body.Count > 1)
             {
-                Vector3 tCurPos = this.Body[i].transform.localPosition;
-                this.Body[i].transform.localPosition = tOldPos;
-                tOldPos = tCurPos;
+                for (int i = 1; i < this.Body.Count; ++i)
+                {
+                    Vector3 tCurPos = this.Body[i].transform.localPosition;
+                    this.Body[i].transform.localPosition = tOldPos;
+                    tOldPos = tCurPos;
+                }
             }
         }
     }
@@ -42,15 +45,21 @@ public class LocalPlayerImpl : Player
             {
                 GameObject.Destroy(this.Body[i]);
             }
-            this.Body.Clear();
-            this.Body.Add(this.Head.gameObject);
         }
+        this.Body.Clear();
 
-        data.PlayerInf.bodys.ForEach((item) =>
+        var tHeadPos = data.PlayerInf.bodys[0];
+        var tHeadPosVec = new Vector3(tHeadPos.x, tHeadPos.y, tHeadPos.z);
+        this.Head.transform.localPosition = tHeadPosVec;
+        this.Body.Add(this.Head.gameObject);
+
+        for (int i = 1; i < data.PlayerInf.bodys.Count; ++i)
         {
+            var item = data.PlayerInf.bodys[i];
             GameObject tBodyGo = this.CreateBody();
             tBodyGo.transform.localPosition = new Vector3(item.x, item.y, item.z);
-        });
+            this.Body.Add(tBodyGo);
+        }
     }
 
     public override bool OnEat(FoodCellCtr food)

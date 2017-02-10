@@ -39,6 +39,7 @@ public class PauseViewCtr : MonoBehaviour
 
     public void FinishClick()
     {
+        SceneMgr.SaveLocalGame();
         SceneMgr.Stop();
 
         this.GamingView.UnInitialize();

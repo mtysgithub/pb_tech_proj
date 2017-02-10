@@ -10,17 +10,8 @@ public class MainViewCtr : MonoBehaviour
     {
         Debug.Log("BeginClick");
 
-        if (SceneMgr.ActiveScene == null)
+        if (SceneMgr.NewLocalGame())
         {
-            GameObject tPlayerA = PlayerCtor.Instance.CreatLocalPlayer();
-            Player playerA = tPlayerA.GetComponent<Player>();
-            playerA.id = 0;
-
-            SceneCtr tScene = SceneMgr.Make(0.05f);
-            tScene.InitializePlayer(playerA);
-
-            tScene.Begin();
-
             this.gameObject.SetActive(false);
             GamingView.gameObject.SetActive(true);
             GamingView.Initialize();
@@ -30,6 +21,12 @@ public class MainViewCtr : MonoBehaviour
     public void ContinueClick()
     {
         Debug.Log("LoadClick");
+        if (SceneMgr.ContinueLocalGame())
+        {
+            this.gameObject.SetActive(false);
+            GamingView.gameObject.SetActive(true);
+            GamingView.Initialize();
+        }
     }
 
     public void QuitClick()

@@ -26,17 +26,9 @@ public class SceneCtr : MonoBehaviour
     private int mRateCnt = 0;
     private bool mIsPaused = false;
 
-    public void Intialize(SceneMgr sceneMgr, float density /*[0f,1f]*/, UIWidget box)
+    public void New(SceneMgr sceneMgr, float density /*[0f,1f]*/, UIWidget box)
     {
-        this.SceneMgr = sceneMgr;
-
-        this.transform.parent = box.transform;
-        this.transform.localPosition = Vector3.zero;
-        this.transform.localScale = Vector3.one;
-
-        var tSizeVec = box.localSize;
-        this.WidthSize = (int)tSizeVec.x;
-        this.HeightSize = (int)tSizeVec.y;
+        this.InitalizeBoard(sceneMgr, box);
 
         System.Random tRandomer = new System.Random((int)DateTime.Now.Ticks);
 
@@ -69,7 +61,7 @@ public class SceneCtr : MonoBehaviour
             playerA.transform.parent = this.transform;
             playerA.transform.localPosition = Vector3.zero;
             playerA.transform.localScale = Vector3.one;
-            playerA.SetBeginPos(new Vector3(0f, 0f, 1f));
+            //playerA.SetBeginPos(new Vector3(0f, 0f, 1f));
             this.Players.Add(playerA);
         }
         else
@@ -93,22 +85,29 @@ public class SceneCtr : MonoBehaviour
         //}
     }
 
-    public void Load(SaveLoadMgr.DataWarpper datas)
+    public void Load(SaveLoadMgr.DataWarpper datas, SceneMgr sceneMgr, UIWidget box)
     {
         this.Clear();
+        this.InitalizeBoard(sceneMgr, box);
 
         datas.FoodsInf.ForEach((item) => 
         {
             Vector3 tPos = new Vector3(item.position.x, item.position.y, item.position.z);
             GameObject tFoodGo = this.CreateFood(tPos, item.score);
         });
+    }
 
-        GameObject tPlayerA = PlayerCtor.Instance.CreatLocalPlayer();
-        Player playerA = tPlayerA.GetComponent<Player>();
-        playerA.id = 1;
+    private void InitalizeBoard(SceneMgr sceneMgr, UIWidget box)
+    {
+        this.SceneMgr = sceneMgr;
 
-        this.InitializePlayer(playerA);
-        playerA.Load(datas);
+        this.transform.parent = box.transform;
+        this.transform.localPosition = Vector3.zero;
+        this.transform.localScale = Vector3.one;
+
+        var tSizeVec = box.localSize;
+        this.WidthSize = (int)tSizeVec.x;
+        this.HeightSize = (int)tSizeVec.y;
     }
 
     private GameObject CreateFood(Vector3 pos, int score)

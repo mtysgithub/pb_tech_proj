@@ -11,7 +11,7 @@ public sealed class SaveLoadMgr
     public class DataWarpper
     {
         public PbPlayer PlayerInf;
-        public List<PbFood> FoodsInf;
+        public List<PbFood> FoodsInf = new List<PbFood>();
     }
 
     private static SaveLoadMgr _instance = null;
@@ -38,7 +38,7 @@ public sealed class SaveLoadMgr
         }
 #else
         string tFileName = Application.persistentDataPath + "/save.bin";
-        using (var file = File.Create(tFileName))
+        using (var file = File.OpenRead(tFileName))
         {
             tGameToSave = Serializer.NonGeneric.Deserialize(tGameToSave.GetType(), file) as PbGameFile;
         }
@@ -104,6 +104,7 @@ public sealed class SaveLoadMgr
         using (var file = File.Create(tFileName))
         {
             Serializer.NonGeneric.Serialize(file, tGameToSave);
+            file.Flush();
         }
 #endif
     }

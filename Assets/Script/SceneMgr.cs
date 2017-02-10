@@ -28,12 +28,85 @@ public sealed class SceneMgr : MonoBehaviour
         {
             GameObject tBoard = GameObject.Instantiate(tBoardRes);
             SceneCtr tSceneCtr = tBoard.GetComponent<SceneCtr>();
-            tSceneCtr.Intialize(this, density, SceneBox);
+            tSceneCtr.New(this, density, SceneBox);
 
-            return this.ActiveScene = tSceneCtr;
+            return tSceneCtr;
         }
 
-        return this.ActiveScene = null;
+        return null;
+    }
+
+    public SceneCtr Make(SaveLoadMgr.DataWarpper data)
+    {
+        GameObject tBoardRes = Resources.Load("Prefabs/Board") as GameObject;
+        if (tBoardRes != null)
+        {
+            GameObject tBoard = GameObject.Instantiate(tBoardRes);
+            SceneCtr tSceneCtr = tBoard.GetComponent<SceneCtr>();
+            tSceneCtr.Load(data, this, SceneBox);
+
+            return tSceneCtr;
+        }
+
+        return null;
+    }
+
+    public bool NewLocalGame()
+    {
+        if (this.ActiveScene == null)
+        {
+            GameObject tPlayerA = PlayerCtor.Instance.CreatLocalPlayer();
+            Player playerA = tPlayerA.GetComponent<Player>();
+            playerA.id = 0;
+
+            SceneCtr tScene = this.Make(0.05f);
+            if (tScene != null)
+            {
+                tScene.InitializePlayer(playerA);
+                tScene.Begin();
+                this.ActiveScene = tScene;
+                return true;
+            }
+        }
+        this.ActiveScene = null;
+        return false;
+    }
+
+    public bool ContinueLocalGame()
+    {
+        if (this.ActiveScene == null)
+        {
+            var data = SaveLoadMgr.Instance.Load();
+            if (data != null)
+            {
+                GameObject tPlayerA = PlayerCtor.Instance.CreatLocalPlayer();
+                Player playerA = tPlayerA.GetComponent<Player>();
+                playerA.Load(data);
+
+                SceneCtr tScene = this.Make(data);
+                if (tScene != null)
+                {
+                    tScene.InitializePlayer(playerA);
+                    tScene.Begin();
+                    this.ActiveScene = tScene;
+
+                    //UnityEditor.EditorApplication.isPaused = true;
+
+                    return true;
+                }
+            }
+        }
+        this.ActiveScene = null;
+        return false;
+    }
+
+    public void SaveLocalGame()
+    {
+        var scene = this.ActiveScene;
+        if (scene != null)
+        {
+            SaveLoadMgr.Instance.Save(scene);
+        }
     }
 
     public void Pause(bool pause)
