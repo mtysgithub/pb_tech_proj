@@ -15,6 +15,7 @@ message PbPlayer
 {
 	required int32 id = 1;			//玩家的id
 	repeated PbVector3 bodys = 2;	//贪吃蛇的躯干坐标信息
+	required int32 score = 3;		//得分
 }
 
 /*

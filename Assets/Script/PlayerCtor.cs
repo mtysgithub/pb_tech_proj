@@ -23,6 +23,7 @@ public class PlayerCtor
 
         Player tPlayerACtr = tPlayerA.GetComponent<Player>();
         tPlayerACtr.id = 1;
+        tPlayerACtr.Head.transform.localPosition = new Vector3(0f, 0f, 1f);
 
         return tPlayerA;
     }

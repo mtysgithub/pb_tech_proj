@@ -14,6 +14,14 @@ public class GamingViewCtr : MonoBehaviour
         if (scene != null)
         {
             scene.OnPlayerScoreChanged.Add(OnPlayerScoreChanged);
+
+            scene.Players.ForEach((player) => 
+            {
+                if (player.id < ScoreLabels.Count)
+                {
+                    ScoreLabels[player.id].text = player.score.ToString();
+                }
+            });
         }
     }
 

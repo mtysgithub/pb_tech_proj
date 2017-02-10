@@ -14,11 +14,10 @@ public class LocalPlayerImpl : Player
     {
         if (!MoveDir.Equals(Vector3.zero))
         {
-            float tMovFactor = (SPEED);
-            Vector3 tHeadMoveDeta = MoveDir * tMovFactor;
 
             Vector3 tOldPos = this.Head.transform.localPosition;
-            Vector3 tNewHeadPos = tOldPos + tHeadMoveDeta;
+            Vector3 tNewHeadPos = this.MakeHeadNextPos(MoveDir);
+
             this.Head.transform.localPosition = tNewHeadPos;
 
             if (this.Body.Count > 1)
@@ -36,8 +35,6 @@ public class LocalPlayerImpl : Player
     public override void Load(SaveLoadMgr.DataWarpper data)
     {
         base.Load(data);
-
-        this.id = data.PlayerInf.id;
 
         if (this.Body.Count > 1)
         {
@@ -115,12 +112,35 @@ public class LocalPlayerImpl : Player
         if (!tDir.Equals(Vector2.zero))
         {
             Vector3 tMovDir = new Vector3(tDir.x, tDir.y, 0);
-            if (!(-1 * tMovDir).Equals(this.MoveDir) || (tMovDir).Equals(this.MoveDir))
+            if (!(-1 * tMovDir).Equals(this.MoveDir) && !(this.HitPreBody(tMovDir)))
             {
                 this.PreMoveDir = this.MoveDir;
                 this.MoveDir = tMovDir;
             }
         }
+    }
+
+    private bool HitPreBody(Vector3 tMovDir)
+    {
+        if (this.Body.Count > 1)
+        {
+            Vector3 tNewHeadPos = this.MakeHeadNextPos(tMovDir);
+            var tPreBody = this.Body[1];
+            float magnitude = (tPreBody.transform.localPosition - tNewHeadPos).magnitude;
+            return magnitude < 1f;
+        }
+        return false;
+    }
+
+    private Vector3 MakeHeadNextPos(Vector3 praMovDir)
+    {
+        float tMovFactor = (SPEED);
+        Vector3 tHeadMoveDeta = praMovDir * tMovFactor;
+
+        Vector3 tOldPos = this.Head.transform.localPosition;
+        Vector3 tNewHeadPos = tOldPos + tHeadMoveDeta;
+
+        return tNewHeadPos;
     }
 
     protected Vector2 MoveGestureJuedge()

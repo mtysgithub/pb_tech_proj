@@ -65,6 +65,7 @@ public sealed class SaveLoadMgr
         PbPlayer tPlayerData = new PbPlayer()
         {
             id = tPlayer.id,
+            score = tPlayer.score
         };
         tPlayer.Body.ForEach((GameObject item) => 
         {

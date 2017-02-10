@@ -84,6 +84,13 @@ namespace dataconfig
       get { return _bodys; }
     }
   
+    private int _score;
+    [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"score", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int score
+    {
+      get { return _score; }
+      set { _score = value; }
+    }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }

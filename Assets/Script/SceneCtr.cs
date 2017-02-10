@@ -61,7 +61,6 @@ public class SceneCtr : MonoBehaviour
             playerA.transform.parent = this.transform;
             playerA.transform.localPosition = Vector3.zero;
             playerA.transform.localScale = Vector3.one;
-            //playerA.SetBeginPos(new Vector3(0f, 0f, 1f));
             this.Players.Add(playerA);
         }
         else

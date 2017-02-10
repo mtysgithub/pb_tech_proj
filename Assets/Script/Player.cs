@@ -14,16 +14,15 @@ public abstract class Player : MonoBehaviour
     public Vector3 MoveDir = Vector3.zero;
     public abstract void Move();
 
-    public virtual void Load(SaveLoadMgr.DataWarpper data) { }
+    public virtual void Load(SaveLoadMgr.DataWarpper data)
+    {
+        this.id = data.PlayerInf.id;
+        this.score = data.PlayerInf.score;
+    }
 
     protected virtual void Awake()
     {
         this.Body.Add(Head.gameObject);
-    }
-
-    public void SetBeginPos(Vector3 pos)
-    {
-        this.Head.transform.localPosition = pos;
     }
 
     public abstract bool OnEat(FoodCellCtr go);
