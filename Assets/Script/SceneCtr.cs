@@ -26,8 +26,17 @@ public class SceneCtr : MonoBehaviour
     private int mRateCnt = 0;
     private bool mIsPaused = false;
 
-    public void New(SceneMgr sceneMgr, float density /*[0f,1f]*/, UIWidget box)
+    public void New(SceneMgr sceneMgr, dataconfig.GAMEPARAMSCONFIG_CONF_ARRAY tConfig, /*[0f,1f]*/ UIWidget box)
     {
+        List<int> tScoreDefList = new List<int>() { 1 };
+        var tDensity = 0.05f;
+        if ((tConfig != null) && (tConfig.items.Count > 0))
+        {
+            var tConfItem = tConfig.items[0];
+            tDensity = tConfItem.food_density;
+            tScoreDefList = tConfItem.foods_socre_def;
+        }
+
         this.InitalizeBoard(sceneMgr, box);
 
         System.Random tRandomer = new System.Random((int)DateTime.Now.Ticks);
@@ -41,12 +50,13 @@ public class SceneCtr : MonoBehaviour
                 if (i == 0 && j == 0) continue;
 
                 float tNum = (tRandomer.Next(0, 100)) * 1.0f / 100.0f;
-                if (tNum < density)
+                if (tNum < tDensity)
                 {
                     int tX = i * CELL_SIZE - (tCellCntOnWidth / 2) * CELL_SIZE;
                     int tY = j * CELL_SIZE - (tCellCntOnHeight / 2) * CELL_SIZE;
 
-                    GameObject tFoodGo = this.CreateFood(new Vector3(tX, tY, 1f), 1);
+                    var tScoreDefIdx = tRandomer.Next(0, tScoreDefList.Count - 1);
+                    GameObject tFoodGo = this.CreateFood(new Vector3(tX, tY, 1f), tScoreDefList[tScoreDefIdx]);
                 }
             }
         }

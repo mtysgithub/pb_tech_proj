@@ -27,22 +27,38 @@ public sealed class SaveLoadMgr
         }
     }
 
+    static dataconfig.GAMEPARAMSCONFIG_CONF_ARRAY GameParamConfig = null;
+
+    public dataconfig.GAMEPARAMSCONFIG_CONF_ARRAY LoadConfig()
+    {
+        if (GameParamConfig != null)
+        {
+            return GameParamConfig;
+        }
+
+        dataconfig.GAMEPARAMSCONFIG_CONF_ARRAY tRet = null;
+        UnityEngine.Object tConfigFile = Resources.Load("Config/dataconfig_gameparamsconfig_conf");
+        if (tConfigFile != null)
+        {
+            byte [] tData = ((TextAsset)tConfigFile).bytes;
+            using (var stream = new System.IO.MemoryStream(tData))
+            {
+                tRet = Serializer.Deserialize<dataconfig.GAMEPARAMSCONFIG_CONF_ARRAY>(stream);
+                stream.Flush();
+            }
+        }
+        return GameParamConfig = tRet;
+    }
+
     public DataWarpper Load()
     {
         PbGameFile tGameToSave = new PbGameFile();
 
-#if !UNITY_EDITOR
-        using (var file = File.Create("save.bin"))
-        {
-            tGameToSave = Serializer.NonGeneric.Deserialize(tGameToSave.GetType(), file) as PbGameFile;
-        }
-#else
         string tFileName = Application.persistentDataPath + "/save.bin";
         using (var file = File.OpenRead(tFileName))
         {
             tGameToSave = Serializer.NonGeneric.Deserialize(tGameToSave.GetType(), file) as PbGameFile;
         }
-#endif
 
         DataWarpper tRet = new DataWarpper()
         {
@@ -95,18 +111,11 @@ public sealed class SaveLoadMgr
             });
         });
 
-#if !UNITY_EDITOR
-        using (var file = File.Create("save.bin"))
-        {
-            Serializer.NonGeneric.Serialize(file, tGameToSave);
-        }
-#else
         string tFileName = Application.persistentDataPath + "/save.bin";
         using (var file = File.Create(tFileName))
         {
             Serializer.NonGeneric.Serialize(file, tGameToSave);
             file.Flush();
         }
-#endif
     }
 }

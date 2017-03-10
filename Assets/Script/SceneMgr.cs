@@ -21,14 +21,14 @@ public sealed class SceneMgr : MonoBehaviour
         UnityEngine.Application.targetFrameRate = FIXED_RATE_COUNT;
     }
 
-    public SceneCtr Make(float density /*[0f,1f]*/)
+    public SceneCtr Make(dataconfig.GAMEPARAMSCONFIG_CONF_ARRAY config)
     {
         GameObject tBoardRes = Resources.Load("Prefabs/Board") as GameObject;
         if (tBoardRes != null)
         {
             GameObject tBoard = GameObject.Instantiate(tBoardRes);
             SceneCtr tSceneCtr = tBoard.GetComponent<SceneCtr>();
-            tSceneCtr.New(this, density, SceneBox);
+            tSceneCtr.New(this, config, SceneBox);
 
             return tSceneCtr;
         }
@@ -59,7 +59,7 @@ public sealed class SceneMgr : MonoBehaviour
             Player playerA = tPlayerA.GetComponent<Player>();
             playerA.id = 0;
 
-            SceneCtr tScene = this.Make(0.05f);
+            SceneCtr tScene = this.Make(SaveLoadMgr.Instance.LoadConfig());
             if (tScene != null)
             {
                 tScene.InitializePlayer(playerA);
