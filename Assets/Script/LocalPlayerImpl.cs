@@ -63,6 +63,7 @@ public class LocalPlayerImpl : Player
     {
         int tScore = food.Score;
         this.score += tScore;
+        Debug.Log(string.Format("id{0} 得分{1}", this.id, this.score));
 
         //for (int i = 0; i < tScore; ++i)
         {

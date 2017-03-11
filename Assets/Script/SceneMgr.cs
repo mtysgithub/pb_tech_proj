@@ -131,9 +131,9 @@ public sealed class SceneMgr : MonoBehaviour
         this.ActiveScene = null;
     }
 
-    public void GameDead(SceneCtr scene)
+    public void Finish(SceneCtr scene)
     {
         this.Pause(true);
-        UiMgr.GameDead(scene);
+        UiMgr.Finish(scene);
     }
 }

@@ -18,7 +18,7 @@ public class UiMgr : MonoBehaviour
         GamingView.gameObject.SetActive(false);
     }
 
-    public void GameDead(SceneCtr scene)
+    public void Finish(SceneCtr scene)
     {
         this.GamingView.UnInitialize();
         this.GamingView.gameObject.SetActive(false);

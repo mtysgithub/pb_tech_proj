@@ -125,7 +125,8 @@ public class SceneCtr : MonoBehaviour
         GameObject tFood = this.DoMakeFood(1);
         if (tFood != null)
         {
-            tFood.AddComponent<FoodCellCtr>();
+            var ctr = tFood.GetComponent<FoodCellCtr>();
+            ctr.Score = score;
             tFood.transform.parent = this.FoodsCntr;
             tFood.transform.localScale = Vector3.one;
             tFood.transform.localPosition = new Vector3(pos.x, pos.y, pos.z);
@@ -194,6 +195,8 @@ public class SceneCtr : MonoBehaviour
     private void OnTick()
     {
         bool dead = false;
+        bool useup = false;
+
         ++mRateCnt;
         mRateCnt %= (10);
 
@@ -249,12 +252,21 @@ public class SceneCtr : MonoBehaviour
                         }
                     }
                 }
+
+                //Debug.Log(string.Format("id{0} 得分{1}", player.id, player.score));
             }
+
+            useup = this.Foods.Count == 0;
+            Debug.Log("剩余 " + this.Foods.Count);
         }
 
         if (dead)
         {
             this.DoGameDead();
+        }
+        else if (useup)
+        {
+            this.DoGameFinish();
         }
     }
 
@@ -282,7 +294,13 @@ public class SceneCtr : MonoBehaviour
     protected virtual void DoGameDead()
     {
         Debug.Log("DoGameDead");
-        SceneMgr.GameDead(this);
+        SceneMgr.Finish(this);
+    }
+
+    protected virtual void DoGameFinish()
+    {
+        Debug.Log("Finish");
+        SceneMgr.Finish(this);
     }
 
     protected virtual void Clear()
