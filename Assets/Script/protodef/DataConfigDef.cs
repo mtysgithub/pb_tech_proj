@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from: protodef/dataconfig_gameparamsconfig_conf.proto
+// Generated from: result/dataconfig_gameparamsconfig_conf.proto
 namespace dataconfig
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"GAMEPARAMSCONFIG_CONF")]
